@@ -32,7 +32,8 @@
   &__item-text {
     font-size: 28px;
     font-weight: 100;
-
+    margin: auto;
+    
     &--checked {
       text-decoration: line-through;
       color: silver;
@@ -66,7 +67,6 @@
 
   &__item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     list-style: none;
     border: 1px solid #eee;

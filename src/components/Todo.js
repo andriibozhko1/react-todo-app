@@ -21,7 +21,7 @@ export default class Todo extends Component {
       let newItem = {
         text: defaultValue,
         id: items.length,
-        status: ""
+        isDone: false
       };
 
       return {
@@ -31,20 +31,20 @@ export default class Todo extends Component {
     });
   };
 
-  setStatus = (id, status) => {
-    this.setState(({ items }) => {
-      items[id].status = status;
-
-      return {
-        items
-      };
-    });
-  };
-
   setFilteredStatus = filteredStatus => {
     this.setState(() => {
       return {
         filteredStatus
+      };
+    });
+  };
+
+  setStatus = ( id ) => {
+    this.setState((prevState) => {
+      prevState.items[id].isDone = !this.state.items[id].isDone;
+
+      return {
+        prevState  
       };
     });
   };
@@ -74,8 +74,7 @@ export default class Todo extends Component {
         <div className="Todo__content">
           <ul className="Todo__list">
             {this.state.items.map(item => {
-              console.log(item.status);
-              if (!this.state.filteredStatus && item.status !== "archive") {
+              if(!this.state.filteredStatus) {
                 return (
                   <Todo.Item
                     key={item.id}
@@ -84,50 +83,67 @@ export default class Todo extends Component {
                     checkItem={this.checkItem}
                     archiveItem={this.archiveItem}
                     setStatus={this.setStatus}
-                    status={item.status}
+                    isDone={item.isDone}
                   />
-                );
+                )
               }
-              if (item.status === this.state.filteredStatus) {
-                return (
-                  <Todo.Item
-                    key={item.id}
-                    id={item.id}
-                    text={item.text}
-                    checkItem={this.checkItem}
-                    archiveItem={this.archiveItem}
-                    setStatus={this.setStatus}
-                    status={item.status}
-                  />
-                );
+              if(this.state.filteredStatus === 'active') {
+                if(!item.isDone) {
+                  return (
+                    <Todo.Item
+                      key={item.id}
+                      id={item.id}
+                      text={item.text}
+                      checkItem={this.checkItem}
+                      archiveItem={this.archiveItem}
+                      setStatus={this.setStatus}
+                      isDone={item.isDone}
+                    />
+                  )
+                }
+              }
+              if(this.state.filteredStatus === 'archive') {
+                if(item.isDone) {
+                  return (
+                    <Todo.Item
+                      key={item.id}
+                      id={item.id}
+                      text={item.text}
+                      checkItem={this.checkItem}
+                      archiveItem={this.archiveItem}
+                      setStatus={this.setStatus}
+                      isDone={item.isDone}
+                    />
+                  )
+                }
               }
             })}
           </ul>
         </div>
         <div className="Todo__footer">
           <div
-            className={`Todo__tab ${this.state.filteredStatus === "checked" ? "Todo__tab--active" : ''}`}
+            className="Todo__tab"
             onClick={() => {
-              this.setFilteredStatus("checked");
+              this.setFilteredStatus("active");
             }}
           >
-            checked
+            Active
           </div>
           <div
-            className={`Todo__tab ${this.state.filteredStatus === false ? "Todo__tab--active" : ''}`}
+            className="Todo__tab"
             onClick={() => {
               this.setFilteredStatus(false);
             }}
           >
-            all
+            All
           </div>
           <div
-            className={`Todo__tab ${this.state.filteredStatus === "archive" ? "Todo__tab--active" : ''}`}
+            className="Todo__tab"
             onClick={() => {
               this.setFilteredStatus("archive");
             }}
           >
-            archive
+            Archive
           </div>
         </div>
       </div>
@@ -135,8 +151,7 @@ export default class Todo extends Component {
   }
 }
 
-Todo.Item = ({ text, id, status, setStatus }) => {
-  console.log(status);
+Todo.Item = ({ text, id, isDone, setStatus }) => {
   return (
     <li className="Todo__item">
       <div className="Todo__item-checkItem">
@@ -144,21 +159,19 @@ Todo.Item = ({ text, id, status, setStatus }) => {
           <input
             name="isActive"
             type="checkbox"
-            checked={status === "checked" ? true : false}
+            checked={isDone}
             onChange={() => {
-              setStatus(id, "checked");
+              setStatus(id);
             }}
           />
         </label>
       </div>
-      <div className={`Todo__item-text ${status === "checked" ? "Todo__item-text--checked" : ''}`}>{text}</div>
       <div
-        className="Todo__archive-item"
-        onClick={() => {
-          setStatus(id, "archive");
-        }}
+        className={`Todo__item-text ${
+          isDone ? "Todo__item-text--checked" : ""
+        }`}
       >
-        [ Archive ]
+        {text}
       </div>
     </li>
   );
