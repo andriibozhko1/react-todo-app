@@ -1,6 +1,7 @@
 {
   "name": "react-todo-app",
   "version": "0.1.0",
+  "homepage": "https://andriibozhko1.github.io/react-todo-app/",
   "private": true,
   "dependencies": {
     "node-sass": "^4.11.0",
